@@ -54,9 +54,9 @@ function LoginForm() {
   };
 
   return (
-    <div className="mx-auto max-w-md">
+    <div className="mx-auto w-full max-w-[340px] sm:max-w-md">
       <h1 className="text-2xl font-bold text-slate-900">Login</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4 rounded-xl border border-slate-200 bg-white p-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-6 sm:w-[400px]">
         <div>
           <label className="block text-sm font-medium text-slate-700">Email</label>
           <input
