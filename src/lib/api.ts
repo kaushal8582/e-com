@@ -1,4 +1,4 @@
-const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api/v1';
+const BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://e-com-backend-u8vl.onrender.com/api/v1';
 
 export interface ApiError {
   success: false;
