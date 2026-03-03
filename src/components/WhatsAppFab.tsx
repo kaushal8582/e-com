@@ -1,6 +1,6 @@
 'use client';
 
-const WHATSAPP_NUMBER = '919786078609';
+const WHATSAPP_NUMBER = '917986078609';
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 export default function WhatsAppFab() {
