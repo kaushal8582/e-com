@@ -4,6 +4,8 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import WhatsAppFab from "@/components/WhatsAppFab";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,7 +26,9 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <Header />
-            <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">{children}</main>
+            <main className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-7xl flex-col px-4 py-6 sm:px-6">{children}</main>
+            <Footer />
+            <WhatsAppFab />
             <Toaster position="top-right" richColors />
           </CartProvider>
         </AuthProvider>

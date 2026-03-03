@@ -31,15 +31,16 @@ export default function CartPage() {
         const pid = typeof item.productId === 'object' && item.productId && '_id' in item.productId
           ? (item.productId as { _id: string })._id
           : String(item.productId);
-        let product: Product | undefined = typeof item.productId === 'object' && item.productId && '_id' in item.productId
-          ? (item.productId as unknown as Product)
-          : undefined;
-        if (!product) {
+        let product: Product | undefined =
+          typeof item.productId === 'object' && item.productId && '_id' in item.productId && (item.productId as unknown as Product).title
+            ? (item.productId as unknown as Product)
+            : undefined;
+        if (!product?.title) {
           try {
             const res = await apiGet<{ success: boolean; data: Product }>(`/products/${pid}`);
             product = res.data;
           } catch {
-            // keep product undefined
+            product = undefined;
           }
         }
         out.push({ productId: pid, product, qty: item.qty, priceSnapshot: item.priceSnapshot });

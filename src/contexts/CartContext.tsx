@@ -92,17 +92,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (!token) {
         throw new Error('Please log in to add to cart');
       }
-      const res = await apiPost<{ success: boolean; data: Cart }>('/cart/items', { productId, qty }, token);
-      setCart(res.data);
+      await apiPost<{ success: boolean; data: Cart }>('/cart/items', { productId, qty }, token);
+      await refreshCart();
     },
-    [token]
+    [token, refreshCart]
   );
 
   const updateQty = useCallback(
     async (productId: string, qty: number) => {
       if (token) {
-        const res = await apiPatch<{ success: boolean; data: Cart }>(`/cart/items/${productId}`, { qty }, token);
-        setCart(res.data);
+        await apiPatch<{ success: boolean; data: Cart }>(`/cart/items/${productId}`, { qty }, token);
+        await refreshCart();
       } else {
         const items = getGuestCart().filter((i) => i.productId !== productId);
         if (qty > 0) items.push({ productId, qty });
@@ -110,21 +110,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setGuestItems([...items]);
       }
     },
-    [token]
+    [token, refreshCart]
   );
 
   const removeItem = useCallback(
     async (productId: string) => {
       if (token) {
-        const res = await apiDelete<{ success: boolean; data: Cart }>(`/cart/items/${productId}`, token);
-        setCart(res.data);
+        await apiDelete<{ success: boolean; data: Cart }>(`/cart/items/${productId}`, token);
+        await refreshCart();
       } else {
         const items = getGuestCart().filter((i) => i.productId !== productId);
         setGuestCart(items);
         setGuestItems([...items]);
       }
     },
-    [token]
+    [token, refreshCart]
   );
 
   return (

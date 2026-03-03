@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,6 +25,7 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [imageIndex, setImageIndex] = useState(0);
+  const router = useRouter();
   const { addItem } = useCart();
 
   const { register, handleSubmit, watch } = useForm<AddToCartForm>({
@@ -54,6 +55,17 @@ export default function ProductPage() {
     try {
       await addItem(product._id, data.qty, product);
       toast.success('Added to cart');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to add to cart');
+    }
+  };
+
+  const onBuyNow = async (data: AddToCartForm) => {
+    if (!product) return;
+    try {
+      await addItem(product._id, data.qty, product);
+      toast.success('Proceeding to checkout');
+      router.push('/checkout');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to add to cart');
     }
@@ -152,24 +164,33 @@ export default function ProductPage() {
           )}
 
           {product.stock > 0 && (
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 flex flex-wrap items-center gap-4">
-              <label className="flex items-center gap-2">
-                <span className="text-sm text-slate-600">Qty</span>
-                <input
-                  type="number"
-                  min={1}
-                  max={product.stock}
-                  {...register('qty')}
-                  className="w-20 rounded border border-slate-300 px-3 py-2 text-slate-900"
-                />
-              </label>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="flex flex-wrap items-center gap-4">
+                <label className="flex items-center gap-2">
+                  <span className="text-sm text-slate-600">Qty</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={product.stock}
+                    {...register('qty')}
+                    className="w-20 rounded border border-slate-300 px-3 py-2 text-slate-900"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-slate-900 px-6 py-2.5 font-medium text-white hover:bg-slate-800"
+                >
+                  Add to cart
+                </button>
+              </form>
               <button
-                type="submit"
-                className="rounded-lg bg-slate-900 px-6 py-2.5 font-medium text-white hover:bg-slate-800"
+                type="button"
+                onClick={handleSubmit(onBuyNow)}
+                className="rounded-lg border-2 border-emerald-600 bg-emerald-600 px-6 py-2.5 font-medium text-white hover:bg-emerald-700"
               >
-                Add to cart
+                Buy now
               </button>
-            </form>
+            </div>
           )}
         </div>
       </div>
