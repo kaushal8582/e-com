@@ -9,6 +9,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Modern Riwaaz – Fine Jewelry",
   description: "Modern Riwaaz – Discover fine jewelry for every occasion.",
+  icons: { icon: "/favicon-32x32.png" },
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +9,12 @@ export default function Header() {
   const { cart, guestItems } = useCart();
   const { user, logout, token } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (mobileMenuOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
 
   const count = token
     ? (cart?.items?.length ? cart.items.reduce((s, i) => s + i.qty, 0) : 0)
@@ -77,33 +83,33 @@ export default function Header() {
         </button>
       </div>
 
-      {mobileMenuOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-black/50 md:hidden"
-            aria-hidden
+      {/* Mobile overlay - tap to close */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-200 md:hidden ${mobileMenuOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+        aria-hidden
+        onClick={() => setMobileMenuOpen(false)}
+      />
+      {/* Mobile sidebar - full height, slides in from right */}
+      <div
+        className={`fixed right-0 top-0 z-50 flex h-screen w-72 max-w-[85vw] flex-col border-l border-slate-200 bg-white shadow-xl transition-[transform] duration-200 ease-out md:hidden ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 px-4 py-3">
+          <span className="font-semibold text-slate-800">Menu</span>
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="rounded p-2 text-slate-500 hover:bg-slate-100"
             onClick={() => setMobileMenuOpen(false)}
-          />
-          <div className="fixed right-0 top-0 z-50 flex h-full w-64 flex-col gap-4 border-l border-slate-200 bg-white p-6 shadow-xl md:hidden">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-slate-900">Menu</span>
-              <button
-                type="button"
-                aria-label="Close menu"
-                className="rounded p-2 text-slate-500 hover:bg-slate-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <nav className="flex flex-col gap-3">
-              {navLinks}
-            </nav>
-          </div>
-        </>
-      )}
+          >
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <nav className="flex flex-1 flex-col gap-0 overflow-y-auto px-3 py-4 [&>a]:block [&>a]:rounded-lg [&>a]:px-3 [&>a]:py-3 [&>a]:text-base [&>button]:mt-2 [&>button]:block [&>button]:w-full [&>button]:rounded-lg [&>button]:py-3 [&>button]:text-left [&>button]:px-3">
+          {navLinks}
+        </nav>
+      </div>
     </header>
   );
 }
