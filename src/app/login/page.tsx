@@ -1,7 +1,8 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,11 +19,28 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: { client_id: string; callback: (res: { credential: string }) => void }) => void;
+          renderButton: (el: HTMLElement, options: Record<string, unknown>) => void;
+        };
+      };
+    };
+  }
+}
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') ?? '/';
   const { user, login, setUser } = useAuth();
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+  const [googleScriptLoaded, setGoogleScriptLoaded] = useState(false);
 
   const {
     register,
@@ -33,6 +51,47 @@ function LoginForm() {
   useEffect(() => {
     if (user) router.replace(redirect);
   }, [user, redirect, router]);
+
+  // Show Google button when script loads, or when already loaded (e.g. client-side nav)
+  useEffect(() => {
+    if (window.google?.accounts?.id) setGoogleScriptLoaded(true);
+  }, []);
+
+  const handleGoogleCredential = async (credential: string) => {
+    try {
+      const res = await apiPost<{ success: boolean; user: User; token: string }>(
+        '/auth/google',
+        { idToken: credential }
+      );
+      if (res.success && res.token) {
+        login(res.token);
+        if (res.user) setUser(res.user);
+        if (res.user?.role === 'ADMIN') {
+          toast.success('Logged in. Redirect to admin panel if needed.');
+        }
+        router.push(redirect);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Google sign-in failed');
+    }
+  };
+
+  useEffect(() => {
+    if (!googleScriptLoaded || !GOOGLE_CLIENT_ID || !window.google?.accounts?.id) return;
+    const el = googleButtonRef.current;
+    if (!el) return;
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: (response: { credential: string }) => handleGoogleCredential(response.credential),
+    });
+    window.google.accounts.id.renderButton(el, {
+      type: 'standard',
+      theme: 'outline',
+      size: 'large',
+      width: 320,
+      text: 'signin_with',
+    });
+  }, [googleScriptLoaded]);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -55,6 +114,11 @@ function LoginForm() {
 
   return (
     <div className="mx-auto w-full max-w-[340px] sm:max-w-md">
+      <Script
+        src="https://accounts.google.com/gsi/client"
+        strategy="afterInteractive"
+        onLoad={() => setGoogleScriptLoaded(true)}
+      />
       <h1 className="text-2xl font-bold text-slate-900">Login</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-6 sm:w-[400px]">
         <div>
@@ -67,7 +131,12 @@ function LoginForm() {
           {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700">Password</label>
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-medium text-slate-700">Password</label>
+            <Link href="/forgot-password" className="text-sm text-slate-600 hover:text-slate-900 underline">
+              Forgot password?
+            </Link>
+          </div>
           <input
             type="password"
             {...register('password')}
@@ -82,6 +151,11 @@ function LoginForm() {
         >
           {isSubmitting ? 'Signing in...' : 'Sign in'}
         </button>
+        {GOOGLE_CLIENT_ID && (
+          <div className="flex justify-center pt-2">
+            <div ref={googleButtonRef} />
+          </div>
+        )}
       </form>
       <p className="mt-4 text-center text-slate-600">
         Don&apos;t have an account?{' '}

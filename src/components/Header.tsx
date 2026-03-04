@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+
+const BRAND_NAME = 'Modern Riwaaz';
 
 export default function Header() {
   const { cart, guestItems } = useCart();
@@ -63,8 +66,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-14 min-h-[3.5rem] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="text-lg font-bold text-slate-900 sm:text-xl">
-          Modern Riwaaz
+        <Link href="/" className="flex items-center gap-2 text-slate-900">
+          <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 shrink-0" />
+          <span className="text-lg font-bold sm:text-xl">{BRAND_NAME}</span>
         </Link>
 
         <nav className="hidden items-center gap-4 md:flex md:gap-6">

@@ -12,6 +12,8 @@ Create `.env.local`:
 
 ```
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3001/api/v1
+# Optional: for "Sign in with Google" (Web client ID from Google Cloud Console)
+# NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 ```
 
 ## Run
@@ -34,6 +36,7 @@ Ensure the **backend API** is running and seeded so products and auth work.
 - `/orders` – My orders (login required)
 - `/orders/[id]` – Order detail
 - `/login`, `/register` – Auth
+- `/forgot-password`, `/reset-password` – Password reset
 
 ## Features
 
