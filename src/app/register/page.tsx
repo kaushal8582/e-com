@@ -146,11 +146,11 @@ export default function RegisterPage() {
         >
           {isSubmitting ? 'Creating account...' : 'Create account'}
         </button>
-        
+        {GOOGLE_CLIENT_ID && (
           <div className="flex justify-center pt-2">
             <div ref={googleButtonRef} />
           </div>
-        
+        )}
       </form>
       <p className="mt-4 text-center text-slate-600">
         Already have an account?{' '}
