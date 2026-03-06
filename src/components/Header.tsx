@@ -67,7 +67,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-14 min-h-[3.5rem] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 text-slate-900">
-          <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 shrink-0" />
+          <Image src="/android-chrome-192x192.png" alt="" width={36} height={36} className="h-9 w-9 shrink-0" />
           <span className="text-lg font-bold sm:text-xl">{BRAND_NAME}</span>
         </Link>
 
