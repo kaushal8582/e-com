@@ -55,6 +55,8 @@ function LoginForm() {
   // Show Google button when script loads, or when already loaded (e.g. client-side nav)
   useEffect(() => {
     if (window.google?.accounts?.id) setGoogleScriptLoaded(true);
+console.log(GOOGLE_CLIENT_ID,"hi ye google client id")
+
   }, []);
 
   const handleGoogleCredential = async (credential: string) => {
@@ -111,6 +113,8 @@ function LoginForm() {
       toast.error(e instanceof Error ? e.message : 'Login failed');
     }
   };
+
+  
 
   return (
     <div className="mx-auto w-full max-w-[340px] sm:max-w-md">
